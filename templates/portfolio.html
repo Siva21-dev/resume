@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ name }}'s Resume</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: white;
+      color: black;
+    }
+
+    .wrapper {
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .portfolio-container {
+      max-width: 793px; /* A4 width at 96dpi */
+      padding: 20px;
+      box-sizing: border-box;
+      background: white;
+    }
+
+    .profile-image {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .profile-image img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .portfolio-info {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .portfolio-info h1 {
+      font-size: 1.6rem;
+      margin: 5px 0;
+    }
+
+    .portfolio-info h2 {
+      font-size: 1.1rem;
+      margin: 5px 0;
+    }
+
+    .portfolio-info p {
+      font-size: 0.95rem;
+      margin: 4px 0;
+    }
+
+    .portfolio-section {
+      margin-bottom: 15px;
+    }
+
+    .portfolio-section h3 {
+      font-size: 1.05rem;
+      margin-bottom: 5px;
+      border-bottom: 1px solid black;
+      padding-bottom: 3px;
+    }
+
+    .portfolio-section p,
+    .portfolio-section ul {
+      font-size: 0.9rem;
+      margin: 0;
+    }
+
+    .portfolio-section ul {
+      list-style-type: disc;
+      padding-left: 18px;
+    }
+
+    .portfolio-section ul li {
+      margin-bottom: 3px;
+    }
+
+    .download-btn {
+      display: block;
+      margin: 25px auto;
+      background: black;
+      color: white;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    @media print {
+      .download-btn {
+        display: none;
+      }
+    }
+
+    .print-mode * {
+      color: black !important;
+      background: white !important;
+      box-shadow: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="portfolio-container" id="portfolio-content">
+      <div class="profile-image">
+        <img src="{{ url_for('static', filename='uploads/' + photo_filename) }}" alt="Profile Picture">
+      </div>
+
+      <div class="portfolio-info">
+        <h1>{{ name }}</h1>
+        <h2>{{ title }}</h2>
+        <p><strong>Email:</strong> {{ email }}</p>
+        <p><strong>Phone:</strong> {{ phone }}</p>
+        <p><strong>Address:</strong> {{ address }}</p>
+      </div>
+
+      <div class="portfolio-section">
+        <h3>About Me</h3>
+        <p>{{ description }}</p>
+      </div>
+
+      <div class="portfolio-section">
+        <h3>Skills</h3>
+        <ul>
+          {% for skill in skills.split(',') %}
+          <li>{{ skill.strip() }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="portfolio-section">
+        <h3>Education</h3>
+        <p>{{ education }}</p>
+      </div>
+
+      <div class="portfolio-section">
+        <h3>Experience</h3>
+        <p>{{ experience }}</p>
+      </div>
+    </div>
+  </div>
+
+  <button id="download-btn" class="download-btn">Download as PDF</button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+    document.getElementById("download-btn").addEventListener("click", function () {
+      const element = document.getElementById("portfolio-content");
+      element.classList.add("print-mode");
+
+      const opt = {
+        margin:       0,
+        filename:     '{{ name|replace(" ", "_") }}_Resume.pdf',
+        image:        { type: 'jpeg', quality: 1 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'px', format: [793, 1122], orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save().then(() => {
+        element.classList.remove("print-mode");
+      });
+    });
+  </script>
+</body>
+</html>
